@@ -1,8 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:plyshowcase/ply_view_page.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:js' as js;
+import 'dart:html' as html;
+
+// ...
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +34,23 @@ class MyHomePage extends StatelessWidget {
     if (!await launchUrl(
       url,
       mode: LaunchMode.externalApplication,
+    )) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  // Future<void> _launchUrl(_url) async {
+  //   if (!await launchUrl(_url)) {
+  //     throw 'Could not launch $_url';
+  //   }
+  // }
+
+  Future<void> _launchInWebViewOrVC(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.inAppWebView,
+      webViewConfiguration: const WebViewConfiguration(
+          headers: <String, String>{'my_header_key': 'my_header_value'}),
     )) {
       throw 'Could not launch $url';
     }
@@ -81,11 +103,69 @@ class MyHomePage extends StatelessWidget {
                 '2020-09-19-000010-maxillary.ply',
               ),
             ),
+            SizedBox(
+              height: 15,
+            ),
+            ElevatedButton(
+              child: Text('Without Package(dart:js)'),
+              onPressed: () {
+                js.context.callMethod('open', [
+                  "https://plytest.netlify.app/?https://yks.tv.tr/teeth/stlply/2020-09-19-000010-maxillary.ply",
+                ]);
+              },
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            ElevatedButton(
+              child: Text('Without Package(dart:html)'),
+              onPressed: () {
+                html.window.open(
+                    "https://plytest.netlify.app/?https://yks.tv.tr/teeth/stlply/2020-09-19-000010-maxillary.ply",
+                    'new tab');
+              },
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            ElevatedButton(
+              child: Text('Without Package(dart:html) popup'),
+              onPressed: () {
+                html.window.open(
+                    "https://plytest.netlify.app/?https://yks.tv.tr/teeth/stlply/2020-09-19-000010-maxillary.ply",
+                    'popup',
+                    'left=100,top=100,width=800,height=600');
+              },
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text("Links coming from project"),
+            ElevatedButton(
+              onPressed: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PlyViewPage(
+                            param:
+                                "https://yks.tv.tr/teeth/stlply/2020-09-19-000010-maxillary.ply")))
+              },
+              child: Text(
+                'iframe',
+              ),
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PlyViewPage(
+                      param:
+                          "https://yks.tv.tr/teeth/stlply/2020-09-19-000010-maxillary.ply")));
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
